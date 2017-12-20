@@ -93,7 +93,15 @@ func (c *Connection) HandleRequests() {
 
 			// reply
 			binary.Write(c.plainconn, binary.BigEndian, &rh)
+		case NBD_CMD_FLUSH:
+			fmt.Println("received flush command")
+			err = c.backend.Flush(nil)
+			if err != nil {
+				fmt.Printf("flushing the backend failed: %s\n", err)
+				rh.NbdError = NBD_EIO
+			}
 
+			binary.Write(c.plainconn, binary.BigEndian, &rh)
 		default:
 			fmt.Printf("unsupported command %d\n", req.NbdCommandType)
 		}
