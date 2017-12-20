@@ -56,7 +56,9 @@ func (s *Server) ListenAndServe(address string) error {
 		fmt.Println("Done negotiating")
 		fmt.Printf("got vdiskID: %s\n", name)
 
-		conn.HandleRequests()
-		conn.Close()
+		go func() {
+			conn.HandleRequests()
+			conn.Close()
+		}()
 	}
 }

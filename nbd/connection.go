@@ -91,7 +91,6 @@ func (c *Connection) HandleRequests() {
 				}
 			}
 
-			// reply
 			binary.Write(c.plainconn, binary.BigEndian, &rh)
 		case NBD_CMD_FLUSH:
 			fmt.Println("received flush command")
