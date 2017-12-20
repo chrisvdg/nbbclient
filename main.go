@@ -7,12 +7,13 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/chrisvdg/nbbclient/nbd"
-	"github.com/chrisvdg/nbbclient/nbd/backend"
+	"github.com/chrisvdg/nbdserver/nbd"
+	"github.com/chrisvdg/nbdserver/nbd/backend"
 )
 
 const (
 	listenAddress = ":7777"
+	exportName    = "default"
 )
 
 func main() {
@@ -49,6 +50,9 @@ func main() {
 	// start server
 	server := nbd.NewServer(backend)
 	fmt.Printf("NBD server listening on: `%s`\n", listenAddress)
-	fmt.Printf("With backend file: `%s` of size %d\n", file.Name(), stat.Size())
-	server.ListenAndServe(listenAddress)
+	fmt.Printf("With backend file: `%s` of size %d bytes\n", file.Name(), stat.Size())
+	err = server.ListenAndServe(listenAddress)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
