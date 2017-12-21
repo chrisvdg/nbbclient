@@ -3,11 +3,14 @@ package backend
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 )
 
 const (
-	addressInFileMask = 0x00ffffff
+	// MaxSingleFileSize is the maximum size for a single file
+	// for a multi file backend
+	MaxSingleFileSize = 0x00ffffff
 )
 
 // NewMultiFile returns a new backend that has multiple files
@@ -40,7 +43,7 @@ func (f *MultiFile) WriteAt(ctx context.Context, b []byte, offset int64) (int64,
 		return 0, err
 	}
 
-	n, err := file.WriteAt(b, offset&addressInFileMask)
+	n, err := file.WriteAt(b, offset&MaxSingleFileSize)
 
 	return int64(n), err
 }
@@ -53,7 +56,7 @@ func (f *MultiFile) ReadAt(ctx context.Context, offset, length int64) ([]byte, e
 	}
 
 	bytes := make([]byte, length)
-	_, err = file.ReadAt(bytes, offset&addressInFileMask)
+	_, err = file.ReadAt(bytes, offset&MaxSingleFileSize)
 
 	return bytes, err
 }
@@ -70,9 +73,23 @@ func (f *MultiFile) Flush(ctx context.Context) error {
 	return nil
 }
 
+// Close implements Backend.Close
+func (f *MultiFile) Close(ctx context.Context) error {
+	for _, f := range f.files {
+		err := f.Close()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // GetFile returns the file corresponding to the first byte of the address
 func (f *MultiFile) getFile(reqAddress int64) (*os.File, error) {
-	fileAddr := reqAddress >> 24
+	fileAddr := reqAddress / MaxSingleFileSize
+
+	fmt.Println(fileAddr)
 
 	if int(fileAddr) >= len(f.files) {
 		return nil, errors.New("Invalid file address")

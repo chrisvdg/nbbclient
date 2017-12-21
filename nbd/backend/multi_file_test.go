@@ -85,10 +85,8 @@ func TestMultiFile_GetFile(t *testing.T) {
 
 func generateFiles(n int) ([]*os.File, error) {
 	var files []*os.File
-	var err error
 	for i := 0; i < n; i++ {
-		var file *os.File
-		file, err = ioutil.TempFile(os.TempDir(), "nbd_test_file")
+		file, err := ioutil.TempFile(os.TempDir(), "nbd_test_file")
 		if err != nil {
 			cleanupFiles(files)
 			return nil, err
