@@ -38,15 +38,6 @@ func (s *Server) ListenAndServe(address string) error {
 
 		conn, err := NewConn(plainConn, s.Backend)
 
-		/* Old style negotiation
-		err = conn.OldNegotiation(s.Backend.Size())
-		if err != nil {
-			fmt.Printf("Something went wrong negotiating: %s\n", err)
-			return err
-		}
-		*/
-
-		// Fixed newstyle negotiation
 		name, err := conn.Negotiate(s.Backend.Size())
 		if err != nil {
 			fmt.Printf("Something went wrong negotiating: %s\n", err)

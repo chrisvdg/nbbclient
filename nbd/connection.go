@@ -65,14 +65,12 @@ func (c *Connection) HandleRequests() {
 			// send reply header
 			binary.Write(c.plainconn, binary.BigEndian, &rh)
 
-			// send data
+			// send data if no error occurred
 			if rh.NbdError == 0 {
 				binary.Write(c.plainconn, binary.BigEndian, data)
 			}
-
 		case NBD_CMD_WRITE:
 			fmt.Println("received write command")
-			rep := &nbdReply{}
 			// read data from request and write to backend
 			buf := make([]byte, req.NbdLength)
 			binary.Read(c.plainconn, binary.BigEndian, &buf)
@@ -80,14 +78,14 @@ func (c *Connection) HandleRequests() {
 			_, err := c.backend.WriteAt(nil, buf, int64(req.NbdOffset))
 			if err != nil {
 				fmt.Printf("Something went wrong writing to the backend: %v", err)
-				rep.NbdError = NBD_EIO
+				rh.NbdError = NBD_EIO
 			}
 
-			if rep.NbdError == 0 {
+			if rh.NbdError == 0 {
 				err = c.backend.Flush(nil)
 				if err != nil {
 					fmt.Printf("Something went wrong flushing the backend: %v", err)
-					rep.NbdError = NBD_EIO
+					rh.NbdError = NBD_EIO
 				}
 			}
 
@@ -187,7 +185,7 @@ func (c *Connection) Negotiate(exportSize uint64) (string, error) {
 			}
 
 			// empty zeroes
-			if clf.NbdClientFlags&NBD_FLAG_C_NO_ZEROES == 0 && opt.NbdOptID == NBD_OPT_EXPORT_NAME {
+			if clf.NbdClientFlags&NBD_FLAG_C_NO_ZEROES == 0 {
 				// send 124 bytes of zeroes.
 				zeroes := make([]byte, 124, 124)
 				if err := binary.Write(c.plainconn, binary.BigEndian, zeroes); err != nil {

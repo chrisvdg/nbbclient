@@ -27,6 +27,7 @@ func (f *File) Size() uint64 {
 // WriteAt implements Backend.WriteAt
 func (f *File) WriteAt(ctx context.Context, b []byte, offset int64) (int64, error) {
 	n, err := f.file.WriteAt(b, offset)
+
 	return int64(n), err
 }
 
@@ -34,6 +35,7 @@ func (f *File) WriteAt(ctx context.Context, b []byte, offset int64) (int64, erro
 func (f *File) ReadAt(ctx context.Context, offset, length int64) ([]byte, error) {
 	bytes := make([]byte, length)
 	_, err := f.file.ReadAt(bytes, offset)
+
 	return bytes, err
 }
 

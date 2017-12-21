@@ -14,6 +14,7 @@ import (
 const (
 	listenAddress = ":7777"
 	exportName    = "default"
+	blockSize     = 1024
 )
 
 func main() {
@@ -53,6 +54,6 @@ func main() {
 	fmt.Printf("With backend file: `%s` of size %d bytes\n", file.Name(), stat.Size())
 	err = server.ListenAndServe(listenAddress)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 }
