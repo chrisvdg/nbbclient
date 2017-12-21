@@ -3,7 +3,6 @@ package backend
 import (
 	"context"
 	"errors"
-	"fmt"
 	"os"
 )
 
@@ -88,8 +87,6 @@ func (f *MultiFile) Close(ctx context.Context) error {
 // GetFile returns the file corresponding to the first byte of the address
 func (f *MultiFile) getFile(reqAddress int64) (*os.File, error) {
 	fileAddr := reqAddress / MaxSingleFileSize
-
-	fmt.Println(fileAddr)
 
 	if int(fileAddr) >= len(f.files) {
 		return nil, errors.New("Invalid file address")

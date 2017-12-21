@@ -54,7 +54,6 @@ func (c *Connection) HandleRequests() {
 
 		switch req.NbdCommandType {
 		case NBD_CMD_READ:
-			fmt.Println("received read command")
 			// read from backend
 			data, err := c.backend.ReadAt(nil, int64(req.NbdLength), int64(req.NbdLength))
 			if err != nil {
@@ -70,7 +69,6 @@ func (c *Connection) HandleRequests() {
 				binary.Write(c.plainconn, binary.BigEndian, data)
 			}
 		case NBD_CMD_WRITE:
-			fmt.Println("received write command")
 			// read data from request and write to backend
 			buf := make([]byte, req.NbdLength)
 			binary.Read(c.plainconn, binary.BigEndian, &buf)
@@ -91,7 +89,6 @@ func (c *Connection) HandleRequests() {
 
 			binary.Write(c.plainconn, binary.BigEndian, &rh)
 		case NBD_CMD_FLUSH:
-			fmt.Println("received flush command")
 			err = c.backend.Flush(nil)
 			if err != nil {
 				fmt.Printf("flushing the backend failed: %s\n", err)
